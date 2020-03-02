@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html lang="en" data-ng-app="filter">
+<head>
+	<meta charset="UTF-8">
+    <title>{{ "Angular" | uppercase }}</title>
+</head>
+<body>
+    
+    <label for="nome">Digite algo:
+        <input type="text" data-ng-model="nome">    
+    </label>
+
+    {{ nome | timeOfDay }}
+
+    <script src="angular.min.js"></script>
+    <script>
+
+        angular.module('filter', [])
+            .filter('timeOfDay', function(){
+                return function(text){
+                    if(text){
+                        if(new Date().getHours() === 18){
+                            return 'Olaaaa boa tarde' //lembre-se o text corresponde aquilo que estou escrevendo, o input
+                        }else{
+                            return 'bom dia glr'
+                        }
+                    }
+                }
+            })
+
+    </script>     
+</body>
+</html>

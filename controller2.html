@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en" data-ng-app="controller">
+<head>
+	<meta charset="UTF-8">
+    <title>{{ "Angular" | uppercase }}</title>
+</head>
+<body data-ng-controller="UserController as People">
+    <!-- OBSERVAÇÃO IMPORTANTE: SE EU SEPARO OS CONTROLLERS AINDA ASSIM É POSSIVEL ACESSAR OS DADOS DO CONTROLLER COLOCADO EM UMA TAG PAI-->
+    
+    <h1> {{ titulo }}</h1>
+    <ul>
+        <li data-ng-repeat="user in People.users">
+            {{ user.name }} - {{ user.email }}
+        </li>
+    </ul>
+
+    <script src="angular.min.js"></script>
+    <script>
+
+        angular.module('controller', [])
+            .controller('UserController', UserController)
+
+            function UserController(){
+                const vm = this              //vm significa view model... já que this é perigoso usar, usamos essa gambiarra
+                vm.titulo = 'Title'
+                vm.users = [
+                    { name: 'Arlindo', email: 'arlindo@bol'},
+                    { name: 'orlando', email: 'orlando@oi'},
+                    { name: 'bartolomeu', email: 'bart@uol'}
+                ]
+            }
+
+    </script>     
+</body>
+</html>

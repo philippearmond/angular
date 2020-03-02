@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="en" data-ng-app="BeMean">
+<head>
+	<meta charset="UTF-8">
+    <title>{{ "Angular" | uppercase }}</title>
+</head>
+<body data-ng-controller="UserController as Users">
+
+    <label for="searchBar">Busca: <!--FILTER DO SEARCH BAR... o nome que esta no model abaixo vai para o parametro do filter onde quero buscar-->
+        <input type="text" data-ng-model="searchUser">
+    </label>
+    
+    <h1> {{ Users.titulo }} </h1>
+
+    <table>
+        <thead>
+            <!--<tr data-ng-repeat="user in Users.users"> Parte retirada para nao iterar nas chaves, repare que passei o array pra baixo apenas com o indice 0 para repetir apenas uma vez, já que chamo o key-->
+                <th data-ng-repeat="(key, value) in Users.users[0]"> {{ key }}</td>
+            </tr>
+        </thead>
+        <tbody>                                         <!-- aqui o filtro orderBy foi utilizado sem variavel-->
+            <tr data-ng-repeat="user in Users.users | orderBy:'name' | filter:searchUser">
+                <td data-ng-repeat="(key, value) in user"> {{ value }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    
+
+        <!-- Abaixo exemplo simplificado do que foi feito
+        <li data-ng-repeat="users in Users.users">
+
+            <span data-ng-repeat="info in users">{{ info }}</span>
+        </li>
+        -->
+
+
+        <div data-ng-controller="CursoController as Cursos">
+            <span data-ng-init="predicate = 'idade'; reverse = true"></span><!--Diretiva para criação de variavel na view-->
+            <h1>{{ Cursos.titulo }}</h1>
+    
+        <table>
+            <thead>
+                <!--<tr data-ng-repeat="user in Users.users"> Parte retirada para nao iterar nas chaves, repare que passei o array pra baixo apenas com o indice 0 para repetir apenas uma vez, já que chamo o key-->
+                    <th data-ng-repeat="(key, value) in Cursos.teachers[0]"> {{ key }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="courses in Cursos.teachers | orderBy: predicate: reverse"> <!-- aqui o filtro orderBy foi utilizado com variavel-->>
+                    <td data-ng-repeat="(key, value) in courses"> {{ value }}</td>
+                </tr>
+            </tbody>
+        </table>    
+
+
+        <hr>
+
+        <ul>
+            <li data-ng-repeat="courses in Cursos.teachers">
+                {{ courses.course }} - {{ courses.idade | maiorIdade }}
+            </li>
+        </ul>
+    </div>
+
+
+    <script src="angular.min.js"></script>
+    <script>
+
+        angular.module('BeMean', [])
+            .controller('UserController', UserController)
+            .controller('CursoController', CursoController)
+            
+            .filter('maiorIdade', () => (
+                (idade) => {
+                    if(!isNaN(idade)){
+                        return idade >= 18 ? 'Maior Idade' : 'Menor Idade'
+                    }
+                }
+            ))
+
+
+        function UserController() { //eu sei disso... voce gosta mesmo é de me deixar louco pra te agarrar
+            const vm = this
+            vm.titulo = 'Alunos'
+            vm.users = [
+                { name: 'arlindo', email: 'arlindo@bol'},
+                { name: 'fabin', email: 'ola@mundo' },
+                { name: 'obaa', email: 'oba@ola'}
+            ]
+        }
+
+        function CursoController() {
+            const vm = this
+            vm.titulo = 'Cursos'
+            vm.teachers = [
+                {name: 'Yuri', idade: 23, course: 'Git e Bash'},
+                {name: 'Marcos', idade: 17, course: 'Linux'},
+                {name: 'Eduardo', idade: 27, course: 'PHP - Designer Patterns'},
+                {name: 'Talita', idade: 16, course: 'FrontEnd'}
+            ]
+        }
+
+
+    </script>     
+</body>
+</html>

@@ -1,0 +1,106 @@
+INTRO - Para habilitar toda a utilização do angular no codigo preciso alocar o data-ng-app na tag que está envolvido oq quero transformar. ex: colocando no body, todo escopo... html toda pagina, table so naquela tabela.
+
+Para criar a ligação/conexao coloco dentro de script "    angular.module("passo o nome definido no app", []) o segundo parametro corresponde a injeção de dependencias
+
+
+
+
+Filtros sao utilizados no angular para exibição ao usuario, formata os dados exibidos para o usuario.
+Altera apenas a view o model permanece o mesmo.
+
+O angular possui seus proprios filtros como lowerCase upperCase mas tb posso criar os meus.
+
+Sempre que criar um filtro preciso testar o parametro que passei naquela função, se nao vai da erro!!! PRECISO TESTAR TODOS OS PARAMETROS PASSADOS.
+(ex: criei um filtro pra inverter string em um texto que passei text como parametro.... entao devo criar um if para esse text e se for true retorno o filtro ( text.split('').reverse('').join('') ) )
+
+MAIS NO EXEMPLO PRATICO FILTER
+
+
+
+- CRUD ORDER BY - o orderby é usado na diretiva repeat (repeat, controller, app) e pode ser passado dois parametros o predicate e o reverse que é um boleano
+ex: user in users.user | orderBy 'name', true       dessa forma vai ordernar pelo nome e vai reverter por estar true
+
+
+- Diretiva para criação de variavel na view -> data-ng-init="predicate = 'name'; reverse = true" (o exemplo aplicado foi o do filtro orderBy)
+
+
+- O filter de nome filter - busca pela palavra ou letra definida, 'deletando' todo o restante
+
+
+
+
+
+ROTAS - SEPARAR O JS DO HTML SALVAR COMO APP E PUXAR COMO SE FOSSE ACESSAR UM SCRIPT NATURALMENTE
+ngRoute vai cuidar do roteamento.
+
+- Utilizaremos o $routeProvider, ele só pode ser injetado dentro da função config.
+PORTANTO, NAO POSSO COLOCAR DENTRO DE UM CONTROLLER!!! AS ROTAS SAO DEFINIDAS NOS MODULOS, TODO MODULO TEM UMA FUNÇÃO CONFIG e la injetamos o $routeProvider
+
+cdn -> <script src="//code.angularjs.org/1.5.6/angular-route.js"></script>
+
+dps injeto no modulo angular.module('pararara', ['ngRoute'])
+
+- a configuração das rotas se da atraves dos metodos when e otherwise do serviço $routeProvider
+
+.config(function($routeProvider) {
+	$routeProvider
+	.when()
+	.otherwise()	
+})
+
+- a função when é a responsavel em configurar as rotas e ela possui algumas funçoes uteis como templateUrl, controlle, controllerAs e etc...(05:30)
+
+-ex pratico de como ficara uma rota
+
+.config(function($routeProvider) {
+	$routeProvider
+	.when('/users', {  caminho apos o endereço
+	templateUrl: 'users.html',  caminho pasta
+	controller: 'UserController',
+	controllerAs: 'User'
+	})
+	.otherwise({
+	redirectTo: '/index'   se nao tiver nada vai redirecionar pra ca
+	})
+})
+
+
+
+NG-VIEW retirei tudo que quero renderizar na interface (tipo appComponente do react) e injeto na parte html como ng-view dentro de uma div
+
+PARA CONFERIR SE OQ FIZ ESTÁ CORRETO 07:10 ATE 11
+
+
+- PARAMETROS NAS ROTAS $routeparams
+injetaremos no controller necessario
+Criarei uma rota que ira mostrar informaçoes de um usuario pelo seu ID, nesse caso sua posição no nosso Array, para isso preciso criar uma rota que aceite o parametro do id e pra isso precisamos injetar no controller o $routeparams ex:
+
+function userDetailController($routeParams) {
+	var vm = this
+	vm.routeParams = $routeParams
+}
+
+
+- Depois criar um HTML dentro de views chamado user-details.html com as info:
+
+buscar o user pelo id : {{ UserDetail.routeParams.id }}  esse id vou receber la no config no routeProvider
+nome : {{ UserDetail.users[UserDetail.routeParams.id].name }}
+
+ex de como ficara a rota:
+
+.config(function($routeProvider) {
+	$routeProvider
+	.when('/users', {  caminho apos o endereço
+	templateUrl: 'users.html',  caminho pasta
+	controller: 'UserController',
+	controllerAs: 'User'
+	})
+	.otherwise({
+	redirectTo: '/index'   se nao tiver nada vai redirecionar pra ca
+	})
+	.when('/users/:id', {  caminho apos o endereço passando o id via parametro, observe, para passar parametro uso :
+	templateUrl: 'users.html',  caminho pasta
+	controller: 'UserController',
+	controllerAs: 'User'
+	})
+})

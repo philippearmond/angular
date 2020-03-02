@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="en" data-ng-app="BeMean">
+<head>
+	<meta charset="UTF-8">
+    <title>{{ "Angular" | uppercase }}</title>
+</head>
+<body data-ng-controller="UserController as Users">
+
+    <label for="searchBar">Busca: 
+        <input type="text" data-ng-model="searchUser">
+    </label>
+    
+    <h1> {{ Users.titulo }} </h1>
+
+    <table>
+        <thead>
+            <th data-ng-repeat="(key, value) in Users.users[0]"> {{ key }} </td>
+            </tr>
+        </thead>
+        <tbody>                     
+            <tr data-ng-repeat="user in Users.users | orderBy:'name':false | filter:searchUser">
+                <td data-ng-repeat="(key, value) in user"> {{ value }} </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <p>
+        <label>Nome:
+            <input type="text" data-ng-model="form.Users.name">
+        </label>
+        <br>
+        <label>Email:
+            <input type="email" data-ng-model="form.Users.email">
+        </label>
+    </p>
+
+    <!-- Repare abaixo que a função add la do controller precisa ser chamada dentro do objeto Users, pois defini o 'as' -->
+    <button data-ng-click="Users.add(form.Users)">ADD USER</button>
+    
+
+
+    <hr>
+
+
+        <div data-ng-controller="CursoController as Cursos">
+
+            <span data-ng-init="predicate = 'name'; reverse = false"></span>
+            <h1>{{ Cursos.titulo }}</h1>
+    
+        <table>
+            <thead>
+                
+                    <th data-ng-repeat="(key, value) in Cursos.cu[0]"> {{ key }} </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="courses in Cursos.teachers | filter:searchUser | orderBy:'name' "> 
+                    <td data-ng-repeat="(key, value) in courses"> {{ value }} </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p>
+            <label>Nome:
+                <input type="text" data-ng-model="form.Cursos.name">
+            </label>
+            <br>
+            <label>Curso: 
+                <input type="text" data-ng-model="form.Cursos.course">
+            </label>
+        </p>
+            <button data-ng-click="Cursos.add(form.Cursos)">ADD CURSO</button>
+
+            
+
+    <script src="angular.min.js"></script>
+    <script>
+
+        angular.module('BeMean', [])
+            .controller('UserController', UserController)
+            .controller('CursoController', CursoController)
+            
+            .filter('maiorIdade', () => (
+                (idade) => {
+                    if(!isNaN(idade)){
+                        return idade >= 18 ? 'Maior Idade' : 'Menor Idade'
+                    }
+                }
+            ))
+
+
+        function UserController() {
+            const vm = this
+            vm.titulo = 'Alunos'
+            vm.users = [
+                { name: 'arlindo', email: 'arlindo@bol'},
+                { name: 'fabin', email: 'ola@mundo' },
+                { name: 'obaa', email: 'oba@ola'}
+            ]
+
+            vm.add = add //repare que continua a acompanhar o this de la de cima... add que recebe é a função que vou criar abaixo
+            function add(user) {
+                vm.users.push(user) //antes estava assim vm.users.push({name: 'ola', email: 'mundo'})
+            }
+        }
+
+        function CursoController() {
+            const vm = this
+            vm.titulo = 'Cursos'
+            vm.teachers = [
+                {name: 'Yuri', course: 'Git e Bash'},
+                {name: 'Marcos', course: 'Linux'},
+                {name: 'Eduardo', course: 'PHP - Designer Patterns'},
+                {name: 'Talita', course: 'FrontEnd'}
+            ]
+
+            vm.add = add
+            function add(course) {
+                vm.teachers.push(course)
+            }
+        }
+
+
+    </script>     
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="en" data-ng-app="controller">
+<head>
+	<meta charset="UTF-8">
+    <title>{{ "Angular" | uppercase }}</title>
+</head>
+<body data-ng-controller="UserController">
+    
+    
+    {{ titulo }}
+
+    <script src="angular.min.js"></script>
+    <script>
+
+        angular.module('controller', [])
+            .controller('UserController', function($scope){
+                $scope.titulo = 'WTF'
+            })
+
+
+    </script>     
+</body>
+</html>

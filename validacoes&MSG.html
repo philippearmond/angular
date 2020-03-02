@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="BeMEAN">
+<head>
+  <meta charset="utf-8">
+  <title>Class 06</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+  <style>
+    .wrapper{
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /*Para criar select - option no materialize preciso criar essa classe se nao ele nao aparece, o materialize sobrescreve ele*/
+    html body select {
+        display: inline-block;
+    }
+
+
+    /*para criar o disable em algum botao ao ocorrer determinada ação ou enquanto nao ocorre, devo colocar essa classe abaixo senao o materialize tb sobrescreve*/
+    [disabled] {
+        background-color: #ccc !important;
+    }
+
+  </style>
+</head>
+<body data-ng_controller="UserController as User">
+  <section class="row wrapper">
+
+
+
+    <form name="User.userform">
+        <input type="text" name="name" minlength="3" ng-model="User.form.email" placeholder="criado pra aula" required> <!--maxlength é a msm coisa-->
+        <p data-ng-show="User.userform.name.$error.minlength">mais de 3 digitos necessarios</p>
+        <p data-ng-show="User.userform.name.$error.required"> Campo Obrigatorio </p>
+
+        <input type="text" name="phone" pattern="/9?([0-9]{4})-?([0-9]{4})/" ng-model="User.form.phone" placeholder="criado pra aula PHONE" required>
+        <p data-ng-show="User.userform.phone.$error.pattern">Telefone invalido</p> <!--Essa regex nao está boa-->
+
+
+        <!--Abaixo, 2° maneira de colocar as msgs
+        <div data-ng-messages="User.userform.phone.$error">
+            <p data-ng-message="required">Telefone required</p>
+            <p data-ng-message="pattern">Telefone incorreto</p>
+        </div>
+        -->
+    </form>
+
+
+    <h1>{{User.titulo}}</h1>
+    <p class="col s12">
+      <label>
+        <input type="text" ng-model="User.form.name" placeholder="Name"> <!--Alterado de form.User para User.form por questao de organização e... chamarei o form no controller la embaixo, posso usar assim pois, form está dentro do controller-->
+      </label>
+      <br>
+      <label>
+        <input type="email" ng-model="User.form.email" placeholder="Email">
+      </label>
+      <br>
+      <label>
+        <input type="text" ng-model="User.form.occupation" placeholder="Occupation">
+      </label>
+      <br>
+      <label>
+        <input type="number" ng-model="User.form.age" placeholder="Age">
+      </label>
+
+  <p>
+
+
+    <button data-ng-disabled="User.editing" data-ng-click="User.add(User.form)" class="btn btn-large green waves-effect waves-light col s12">Add User</button>
+
+    <button data-ng-disabled="!User.editing" data-ng-click="User.save(User.form, $index)" class="btn btn-large blue waves-effect waves-light col s12">Save</button>
+  
+
+</p>
+
+    <span data-ng-init="predicate = 'name'; reverse = true;"></span>
+    <table border="1">
+      <thead>
+        <tr>
+          <th colspan="{{ User.keyLength +1 }}">
+            <label>
+              <input ng-model="searchUser" placeholder="Search">
+            </label>
+          </th>
+        </tr>
+        <tr>
+          <th></th>
+          <th data-ng-repeat="(key,value) in User.users[0]"> <!--Para retirar o bug preciso retirar essa parte video 25:30-->
+                    <a ng-click="User.sort(key)">{{key}}</a>
+                </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="user in User.users | filter:searchUser">
+          <td>
+            <input type="checkbox" id="user-{{$index}}" ng-model="user.selecionado"/> <!--esse index corresponde ao indice da diretiva repeat... selecionado é um marcador que vou chamar no controller para fazer o filtro-->
+            <label for="user-{{$index}}"></label> <!-- Usa-se por causa do materializeCSS ... preciso colocar um 'label for' alinhado ao id quando é checkbox -->
+          </td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.occupation }}</td>
+          <td>{{ user.age }}</td>
+          <td> <button data-ng-click="User.edit(user, $index)" class="btn btn-large red waves-effect waves-light col s12">Edit</button> </td>
+        </tr>
+      </tbody>
+    </table>
+    <button data-ng-click="User.remove(User.users)" class="btn btn-large red waves-effect waves-light col s12">Delete</button>
+  </section>
+
+<script src="angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script>
+  angular.module("BeMEAN",[]) //cdn acima nao quer funcionar, dessa forma nao consigo add ngAnimate como injeção de dependencia e, sendo assim, nao consigo add transitions
+  .controller("UserController", UserController)
+  
+  function UserController() {
+    var vm = this;
+    vm.titulo = "Usuários";
+    vm.predicate = 'name';
+
+    vm.editing = false
+
+    vm.users = [
+      {name: 'Magnum Cortez', email: 'magnum@email.com.br', occupation: 'Developer PHP', age: 33, type: 'teacher', active: true},
+      {name: 'Eduardo Soares', email: 'eduardo@email.com.br', occupation: 'Developer PHP', age: 27, type: 'student', active: true},
+      {name: 'Marcos Furtado', email: 'marcos@email.com.br', occupation: 'Developer PHP', age: 19, type: 'teacher', active: false},
+      {name: 'Pedro Silva', email: 'pedro@email.com.br', occupation: 'Analista de Teste', age: 18, type: 'teacher', active: true},
+      {name: 'Talita Camilo', email: 'talita@email.com.br', occupation: 'Developer FrontEnd', age: 25, type: 'student', active: false},
+      {name: 'Ana Brito', email: 'ana@email.com.br', occupation: 'Analista de Teste', age: 22, type: 'teacher', active: true}
+    ];
+    
+
+
+    function getKeyLength() { //utilizado apenas para desbugar uma coluna que surgia na tabela
+      return Object.keys(angular.copy(vm.users[0])).length;
+    }
+    vm.keyLength = getKeyLength()
+    
+    vm.add = add;
+    function add(user) {
+      vm.users.push(angular.copy(user));
+    }
+    vm.remove = remove;
+    function remove(users) {
+      vm.users = vm.users.filter(el => !el.selecionado) //selecionado foi o nome que passei no ng-model, somente para identificar quem vai ser deletado
+    }
+
+    vm.edit = edit
+    function edit(user, index) {
+      vm.form = angular.copy(user)
+      vm.form.index = index
+
+
+      vm.editing = true //parte do efeito ng-hide... ao clicar em edit o botao aparece, observe no botao como é chamado
+    }
+
+    vm.save = save
+    function save(user) {
+      const users = vm.users.map((el, i) => {
+        if(i === user.index){
+          delete user.index
+          return user
+        }
+        return el
+      })
+      vm.users = users
+      vm.editing = false
+    }
+    
+
+  }
+</script>
+</body>
+</html>

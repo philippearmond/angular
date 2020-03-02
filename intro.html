@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Angular</title>
+</head>
+<body data-ng-app = 'aulaIntro'>
+    2 + 2 = {{ 2 + 2}}
+    <script src="angular.min.js"></script>
+    <script>
+        //repare la em cima oq está entre chaves, o angular está tratando
+        angular.module('aulaIntro', []) //Repare que aqui aplico o nome do data-ng-app... ele é responsavel em disseminar o angular no codigo, eu escolho qual parte alocar
+                                        //se eu colocar na tag html pegara todo o codigo... da forma em que esta pega apenas o que esta dentro de body
+                                        //o segundo parametro corresponde as dependencias que quero injetar nesse modulo(aula intro)
+    </script>                           
+</body>
+</html>
