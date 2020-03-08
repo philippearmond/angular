@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="BeMEAN">
+<head>
+  <meta charset="utf-8">
+  <title>Class 06</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+  <style>
+    .wrapper{
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .animate{
+      transition: all linear 0.5s;
+    }
+
+
+    .ng-valid{
+        background-color: green;
+    }
+
+    .invalid{
+        background-color: red;
+    }
+  </style>
+</head>
+<body data-ng_controller="UserController as User">
+  <section class="row wrapper">
+    <h1>{{User.titulo}}</h1>
+
+
+<form>
+    <div class="col s12"> <!--Preciso criar um nome para o form, criar as classes(valid e invalid) no css e dps chamar aqui abaixo-->
+        <form name="User.userForm" ng-submit="User.submitForm(User.userForm)"> <!-- chamo a função que vou criar no controller passando como parametro o nome do formulario, altero o botao com o type='submit' -->
+            <div ng-class="{'invalid' : User.form.name.$invalid && !User.form.name.$pristine, 'dirty': User.form.name.$dirty}"> <!--como estou utilizando o required, o pristine entra apenas para que nao fique como invalido antes do usuario iniciar e digitar qualquer coisa-->
+                <label> <!-- o dirty tb precisa add a class css, foi utilizado para quando o user digitar, alterar o fundo -->
+                    <input type="text" name="name" ng-model="User.form.name" placeholder="Name" required> <!--ler mais em txt-->
+                </label>
+            </div>
+            <br>
+
+
+
+            <label>
+                <input type="email" ng-model="User.form.email" placeholder="Email">
+            </label>
+            <br>
+            <label>
+                <input type="text" ng-model="User.form.occupation" placeholder="Occupation">
+            </label>
+            <br>
+            <label>
+                <input type="number" ng-model="User.form.age" placeholder="Age">
+            </label>
+        </form>
+    </div>
+  <p>
+
+    
+    <button type="submit" class="btn btn-large green waves-effect waves-light col s12">Add User</button> <!-- ng-click retirado pois agora tenho o ng-submit, type="submit" foi acrescentado -->
+
+    <button data-ng-hide="!User.editing" data-ng-click="User.save(User.form, $index)" class="btn btn-large blue animate waves-effect waves-light col s12">Save</button>
+  </p>
+</form>
+
+
+
+
+
+    <span data-ng-init="predicate = 'name'; reverse = true;"></span>
+    <table border="1">
+      <thead>
+        <tr>
+          <th colspan="{{ User.keyLength +1 }}">
+            <label>
+
+
+
+              <input data-ng-model-options="{ updateOn: 'blur mouseleave'}" data-ng-model="searchUser" placeholder="Search">
+              <!--exemplo acima utilizando blur e mouseleave mas posso usar so blur tb (ao retirar o mouse ou sair com tab)-->
+              <!--data-ng-model-options="{ debounce: 1000 }" (apos 1s)-->
+              <!--data-ng-model-options="{ updateOn: 'default blur', debounce: { default: 3000, blur: 0 } }"
+                TODAS ESSAS OPÇOES PODEM SER SETADAS NO CONTROLLER E CHAMADAS AQUI TB
+            -->
+            
+              <p> {{ searchUser }}</p>
+
+
+
+            </label>
+          </th>
+        </tr>
+        <tr>
+          <th></th>
+          <th data-ng-repeat="(key,value) in User.users[0]"> <!--Para retirar o bug preciso retirar essa parte, video 25:30-->
+                    <a ng-click="User.sort(key)">{{key}}</a>
+                </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="user in User.users | filter:searchUser">
+          <td>
+            <input type="checkbox" id="user-{{$index}}" ng-model="user.selecionado"/> <!--esse index corresponde ao indice da diretiva repeat... selecionado é um marcador que vou chamar no controller para fazer o filtro-->
+            <label for="user-{{$index}}"></label> <!-- Usa-se por causa do materializeCSS ... preciso colocar um 'label for' alinhado ao id quando é checkbox -->
+          </td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.occupation }}</td>
+          <td>{{ user.age }}</td>
+          <td> <button data-ng-click="User.edit(user, $index)" class="btn btn-large red waves-effect waves-light col s12">Edit</button> </td>
+        </tr>
+      </tbody>
+    </table>
+    <button data-ng-click="User.remove(User.users)" class="btn btn-large red waves-effect waves-light col s12">Delete</button>
+  </section>
+
+<script src="angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+<script>
+  angular.module("BeMEAN",[]) //cdn acima nao quer funcionar, dessa forma nao consigo add ngAnimate como injeção de dependencia e, sendo assim, nao consigo add transitions
+  .controller("UserController", UserController)
+  
+  function UserController() {
+    var vm = this;
+    vm.titulo = "Usuários";
+    vm.predicate = 'name';
+
+    vm.editing = false
+
+    vm.users = [
+      {name: 'Magnum Cortez', email: 'magnum@email.com.br', occupation: 'Developer PHP', age: 33},
+      {name: 'Eduardo Soares', email: 'eduardo@email.com.br', occupation: 'Developer PHP', age: 27},
+      {name: 'Marcos Furtado', email: 'marcos@email.com.br', occupation: 'Developer PHP', age: 19},
+      {name: 'Pedro Silva', email: 'pedro@email.com.br', occupation: 'Analista de Teste', age: 18},
+      {name: 'Talita Camilo', email: 'talita@email.com.br', occupation: 'Developer FrontEnd', age: 25},
+      {name: 'Ana Brito', email: 'ana@email.com.br', occupation: 'Analista de Teste', age: 22}
+    ];
+    
+
+
+    function getKeyLength() { //utilizado apenas para desbugar uma coluna que surgia na tabela
+      return Object.keys(angular.copy(vm.users[0])).length;
+    }
+    vm.keyLength = getKeyLength()
+    
+    vm.add = add;
+    function add(user) {
+      vm.users.push(angular.copy(user));
+    }
+    vm.remove = remove;
+    function remove(users) {
+      vm.users = vm.users.filter(el => !el.selecionado) //selecionado foi o nome que passei no ng-model, somente para identificar quem vai ser deletado
+    }
+
+    vm.edit = edit
+    function edit(user, index) {
+      vm.form = angular.copy(user)
+      vm.form.index = index
+
+      vm.editing = true //parte do efeito ng-hide... ao clicar em edit o botao aparece, observe no botao como é chamado
+    }
+
+    vm.save = save
+    function save(user) {
+      const users = vm.users.map((el, i) => {
+        if(i === user.index){
+          delete user.index
+          return user
+        }
+        return el
+      })
+      vm.users = users
+
+
+      vm.editing = false
+    }
+
+
+    vm.submitForm = submitForm
+    function submitForm(user){
+      add(user)  //função criada ali em cima para add.... como estou dentro do escopo do controller posso chamar apenas add, mas caso nao, precisaria chamar vm.add
+    }
+
+    
+
+  }
+</script>
+</body>
+</html>
